@@ -8,32 +8,55 @@ public class PlayerMovement : MonoBehaviour
     private float gravity = 1.0f;
     [SerializeField]
     private float jumpHeight = 15.0f;
+    [SerializeField]
+    private int consecutiveJumps = 2;
 
     private float yVelocity = 0.0f;
+    private int jumpsRemaining;
 
     private CharacterController characterController;
 
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
+        ResetJumps();
     }
 
     private void Update()
     {
-        var horizontalInput = Input.GetAxis("Horizontal");
-        var xVelocity = speed * horizontalInput;
+        var xVelocity = DetermineHorizontalVelocity();
+        var yVelocity = DetermineVerticalVelocity();
+        var velocity = new Vector3(xVelocity, yVelocity, 0);
+        characterController.Move(Time.deltaTime * velocity);
+    }
+
+    private float DetermineHorizontalVelocity()
+    {
+        return speed * Input.GetAxis("Horizontal");
+    }
+
+    private float DetermineVerticalVelocity()
+    {
         if (characterController.isGrounded)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                yVelocity = jumpHeight;
-            }
+            ResetJumps();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && jumpsRemaining > 0)
+        {
+            jumpsRemaining--;
+            yVelocity = jumpHeight;
         }
         else
         {
             yVelocity -= gravity;
         }
-        var velocity = new Vector3(xVelocity, yVelocity, 0);
-        characterController.Move(Time.deltaTime * velocity);
+
+        return yVelocity;
+    }
+
+    private void ResetJumps()
+    {
+        jumpsRemaining = consecutiveJumps;
     }
 }
