@@ -6,6 +6,10 @@ public class PlayerMovement : MonoBehaviour
     private float speed = 5.0f;
     [SerializeField]
     private float gravity = 1.0f;
+    [SerializeField]
+    private float jumpHeight = 15.0f;
+
+    private float yVelocity = 0.0f;
 
     private CharacterController characterController;
 
@@ -17,11 +21,19 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         var horizontalInput = Input.GetAxis("Horizontal");
-        var direction = new Vector3(horizontalInput, 0, 0);
-        if (!characterController.isGrounded)
+        var xVelocity = speed * horizontalInput;
+        if (characterController.isGrounded)
         {
-            direction.y -= gravity;
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                yVelocity = jumpHeight;
+            }
         }
-        characterController.Move(Time.deltaTime * speed * direction);
+        else
+        {
+            yVelocity -= gravity;
+        }
+        var velocity = new Vector3(xVelocity, yVelocity, 0);
+        characterController.Move(Time.deltaTime * velocity);
     }
 }
