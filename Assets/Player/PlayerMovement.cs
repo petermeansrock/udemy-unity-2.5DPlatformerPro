@@ -16,9 +16,16 @@ public class PlayerMovement : MonoBehaviour
 
     private CharacterController characterController;
 
+    // It appears as though CharacterController.isGrounded can be a bit unreliable when using a
+    // y-axis velocity of zero. This constant is being used in place of zero to move the player down
+    // slightly to re-collide with a platform after every observed grounding. In addition to this
+    // value, the CharacterController on the player has had its "Min Move Distance" set to zero.
+    private const float ZERO_VELOCITY = -0.001f;
+
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
+        characterController.minMoveDistance = 0.0f;
         ResetJumps();
     }
 
@@ -40,16 +47,17 @@ public class PlayerMovement : MonoBehaviour
         if (characterController.isGrounded)
         {
             ResetJumps();
+            yVelocity = ZERO_VELOCITY;
+        }
+        else
+        {
+            yVelocity -= gravity;
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && jumpsRemaining > 0)
         {
             jumpsRemaining--;
             yVelocity = jumpHeight;
-        }
-        else
-        {
-            yVelocity -= gravity;
         }
 
         return yVelocity;
