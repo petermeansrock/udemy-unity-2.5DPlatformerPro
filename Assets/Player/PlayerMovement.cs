@@ -5,7 +5,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float speed = 5.0f;
     [SerializeField]
-    private float gravity = 1.0f;
+    private float gravity = 40.0f;
     [SerializeField]
     private float jumpHeight = 15.0f;
     [SerializeField]
@@ -51,7 +51,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            yVelocity -= gravity;
+            yVelocity -= Time.deltaTime * gravity;
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && jumpsRemaining > 0)
