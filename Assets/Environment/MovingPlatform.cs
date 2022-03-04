@@ -12,7 +12,6 @@ public class MovingPlatform : MonoBehaviour
     private Vector3 currentTarget;
     private Vector3 nextTarget;
 
-    // Start is called before the first frame update
     void Start()
     {
         transform.position = startTarget.position;
@@ -20,8 +19,7 @@ public class MovingPlatform : MonoBehaviour
         nextTarget = startTarget.position;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
         float distance = speed * Time.deltaTime;
         transform.position = Vector3.MoveTowards(transform.position, currentTarget, distance);

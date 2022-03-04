@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
 
     private float yVelocity = 0.0f;
     private int jumpsRemaining;
+    private bool isJumpButtonPressed = false;
 
     private CharacterController characterController;
 
@@ -26,15 +27,44 @@ public class PlayerMovement : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
         characterController.minMoveDistance = 0.0f;
-        ResetJumps();
+        ResetRemainingJumps();
     }
 
     private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            isJumpButtonPressed = true;
+        }
+    }
+
+    private void FixedUpdate()
     {
         var xVelocity = DetermineHorizontalVelocity();
         var yVelocity = DetermineVerticalVelocity();
         var velocity = new Vector3(xVelocity, yVelocity, 0);
         characterController.Move(Time.deltaTime * velocity);
+
+        // Reset state of jump button
+        isJumpButtonPressed = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // Snap the player from moving platforms
+        if (other.CompareTag(Tag.MovingPlatform))
+        {
+            transform.parent = other.transform;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        // Unsnap the player from moving platforms
+        if (other.CompareTag(Tag.MovingPlatform))
+        {
+            transform.parent = null;
+        }
     }
 
     private float DetermineHorizontalVelocity()
@@ -46,7 +76,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (characterController.isGrounded)
         {
-            ResetJumps();
+            ResetRemainingJumps();
             yVelocity = ZERO_VELOCITY;
         }
         else
@@ -54,7 +84,7 @@ public class PlayerMovement : MonoBehaviour
             yVelocity -= Time.deltaTime * gravity;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && jumpsRemaining > 0)
+        if (isJumpButtonPressed && jumpsRemaining > 0)
         {
             jumpsRemaining--;
             yVelocity = jumpHeight;
@@ -63,7 +93,7 @@ public class PlayerMovement : MonoBehaviour
         return yVelocity;
     }
 
-    private void ResetJumps()
+    private void ResetRemainingJumps()
     {
         jumpsRemaining = consecutiveJumps;
     }
