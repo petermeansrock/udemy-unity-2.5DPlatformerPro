@@ -14,6 +14,7 @@ public class PlayerMovement : MonoBehaviour
     private float yVelocity = 0.0f;
     private int jumpsRemaining;
     private bool isJumpButtonPressed = false;
+    private Vector3 startingPosition;
 
     private CharacterController characterController;
 
@@ -28,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         characterController.minMoveDistance = 0.0f;
         ResetRemainingJumps();
+        startingPosition = transform.position;
     }
 
     private void Update()
@@ -96,5 +98,19 @@ public class PlayerMovement : MonoBehaviour
     private void ResetRemainingJumps()
     {
         jumpsRemaining = consecutiveJumps;
+    }
+
+    public void TeleportToStartingPosition()
+    {
+        // Disable then re-enable the character controller to avoid consistency issues between the
+        // transform and the character controller
+        characterController.enabled = false;
+        transform.position = startingPosition;
+        characterController.enabled = true;
+
+        // Reset other states related to velocity and input
+        ResetRemainingJumps();
+        yVelocity = 0.0f;
+        isJumpButtonPressed = false;
     }
 }
